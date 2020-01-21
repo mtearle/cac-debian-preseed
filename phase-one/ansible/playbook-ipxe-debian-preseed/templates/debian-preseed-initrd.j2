@@ -1,0 +1,30 @@
+#!ipxe
+#/boot/debian-preseed-initrd
+imgfree
+set ip {{ ansible_default_ipv4.address }}
+set netmask {{ ansible_default_ipv4.netmask }}
+set gateway {{ ansible_default_ipv4.gateway }}
+set net0/ip ${ip}
+set net0/netmask ${netmask}
+set net0/gateway ${gateway}
+set dns 8.8.8.8
+
+show net0/ip
+show net0/netmask
+show net0/gateway
+show dns
+
+#config
+
+ifopen net0
+
+set autopart autopart
+# need to write some glue here with ansible
+set arch amd64
+# unstable
+set release stretch
+set preseedurl http://preseed.example.com/debian-minimal.seed.php?ip={{ ansible_default_ipv4.address }}&netmask={{ ansible_default_ipv4.netmask }}&gateway={{ ansible_default_ipv4.gateway }}
+
+initrd http://ftp.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}/initrd.gz
+#chain http://ftp.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}/linux url=${preseedurl} auto=true netcfg/choose_interface=${net0/mac} priority=critical ${autopart}
+chain http://ftp.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}/linux url=${preseedurl} auto=true priority=critical DEBCONF_DEBUG=5 netcfg/get_ipaddress=${ip} netcfg/get_netmask=${netmask} netcfg/get_gateway=${gateway} netcfg/get_nameservers=${dns} netcfg/disable_dhcp=true ${autopart} 

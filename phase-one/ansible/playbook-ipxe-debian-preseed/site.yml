@@ -1,0 +1,4 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Run Debian iPXE pre seed playbook
+  import_playbook: playbooks/ipxe-debian-preseed.yml

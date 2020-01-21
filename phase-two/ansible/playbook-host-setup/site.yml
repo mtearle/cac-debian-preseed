@@ -1,0 +1,4 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Run Debian Cloud At Cost setup
+  import_playbook: playbooks/debian-cloudatcost-setup.yml

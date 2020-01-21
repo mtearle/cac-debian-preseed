@@ -1,0 +1,11 @@
+#! /bin/sh
+cat << EOF
+#/etc/grub.d/40_custom
+menuentry 'netboot.xyz setup' {
+    insmod part_msdos
+    insmod ext2
+    set root='hd0,msdos1'
+    linux16 /generic-ipxe.lkrn
+    initrd16 /netboot.xyz-initrd
+}
+EOF

@@ -1,0 +1,69 @@
+---
+- hosts: all
+  remote_user: root
+  tasks:
+          - name: Test connection to host
+            ping:
+
+          - name: Update sources.list
+            template:
+                    src: ../templates/sources.list.j2
+                    dest: /etc/apt/sources.list
+
+          - name: Update packages (dist-upgrade)
+            apt:
+                update_cache: yes
+                upgrade: dist
+                autoremove: yes
+            register: output
+
+          - name: Install all the things
+            meta: noop
+
+          - name: Install VM tools
+            apt:
+                    name: open-vm-tools
+
+          - name: Install curl
+            apt:
+                    name: curl
+
+          - name: Install vim
+            apt:
+                    name: vim
+
+          - name: Install less
+            apt:
+                    name: less
+
+          - name: Install postfix
+            apt:
+                    name: postfix
+
+          - name: Install htop
+            apt:
+                    name: htop
+
+          - name: Install git
+            apt:
+                    name: git
+
+          - name: Install wireguard
+            apt:
+                    name: wireguard
+          
+                    #          - name: Install ferm
+                    #            apt:
+                    #                    name: ferm
+          
+          - name: Install fail2ban
+            apt:
+                    name: fail2ban
+         
+                    # benchmarking
+          - name: Install sysbench
+            apt:
+                    name: sysbench
+         
+          - name: All done ...
+            meta: noop

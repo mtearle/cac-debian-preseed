@@ -1,0 +1,10 @@
+#! /bin/sh
+cat << EOF
+#/etc/grub.d/42_custom
+menuentry 'netboot.xyz manual' {
+    insmod part_msdos
+    insmod ext2
+    set root='hd0,msdos1'
+    linux16 /boot/netboot.xyz.lkrn
+}
+EOF

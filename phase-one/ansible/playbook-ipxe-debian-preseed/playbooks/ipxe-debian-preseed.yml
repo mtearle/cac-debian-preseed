@@ -1,0 +1,86 @@
+---
+- hosts: all
+  remote_user: root
+  tasks:
+          - name: Test connection to host
+            ping:
+
+# Reference information -
+#       https://netboot.xyz/usage-digitalocean/
+#
+        
+          - name: Update sources.list
+            template:
+                    src: ../templates/sources.list.j2
+                    dest: /etc/apt/sources.list
+
+          - name: Update packages (dist-upgrade)
+            apt:
+                update_cache: yes
+                upgrade: dist
+                autoremove: yes
+            register: output
+
+          - name: Install curl
+            apt:
+                    name: curl
+
+          - name: Install ca-certificates
+            apt:
+                    name: ca-certificates
+
+          - name: Download generic iPXE lkrn
+            command: wget -O /boot/generic-ipxe.lkrn https://boot.ipxe.org/ipxe.lkrn
+            #get_url:
+            #        #url: https://boot.netboot.xyz/ipxe/generic-ipxe.lkrn
+            #        #url: https://www.archlinux.org/static/netboot/ipxe.28ebfe8a66ac.lkrn
+            #        url: https://boot.ipxe.org/ipxe.lkrn
+            #        dest: /boot/generic-ipxe.lkrn
+            #        force: yes
+            #        owner: root
+            #        group: root
+          
+          - name: Download netboot.xyz iPXE lkrn
+            get_url:
+                    url: https://boot.netboot.xyz/ipxe/netboot.xyz.lkrn
+                    dest: /boot/netboot.xyz.lkrn
+                    force: yes
+                    owner: root
+                    group: root
+          
+          - name: Generate Debian Preseed iPXE initrd
+            template:
+                    src: ../templates/debian-preseed-initrd.j2
+                    dest: /boot/debian-preseed-initrd
+          
+          - name: Generate netboot.xyz iPXE initrd
+            template:
+                    src: ../templates/netboot.xyz-initrd.j2 
+                    dest: /boot/netboot.xyz-initrd
+          
+          - name: Add Grub2 entry for netboot.xyz manual iPXE
+            template:
+                    src: ../templates/grub-netboot.xyz-manual.j2 
+                    dest: /etc/grub.d/42_custom
+                    mode: 0755
+          
+          - name: Add Grub2 entry for Debian Preseed iPXE
+            template:
+                    src: ../templates/grub-debian-preseed.j2 
+                    dest: /etc/grub.d/41_custom
+                    mode: 0755
+          
+          - name: Add Grub2 entry for netboot.xyz iPXE
+            template:
+                    src: ../templates/grub-netboot.xyz.j2 
+                    dest: /etc/grub.d/40_custom
+                    mode: 0755
+          
+          - name: Regenerate grub config
+            command: grub-mkconfig -o /boot/grub/grub.cfg
+          
+          - name: Update grub
+            command: update-grub
+          
+          - name: All done ...
+            meta: noop
